@@ -1,11 +1,12 @@
-
-#include <HX8367.h>
-#include "main.h"
-#include "delay.h"
+#include "HX8367.h"
+#include "Delay.h"
+#include "stm32f4xx.h"		// Connect lib for your stm
 
 /////////////////////////////////////////////////////////
 /////				Settings block					/////
 /////////////////////////////////////////////////////////
+
+//#define FULL_MANUAL_PINS
 
 #define HX8367_DATA_PORT GPIOB
 #define HX8367_CTRN_PORT GPIOA
@@ -102,7 +103,7 @@ typedef struct
 
 static HX8367_Color _HX8367_color;
 
-void HX8367_SetDataOnPins(uint8_t data)
+__STATIC_INLINE void HX8367_SetDataOnPins(uint8_t data)
 {
 	if((uint8_t)0x01U & data) HX8367_D0_SET;
 	else HX8367_D0_RESET;
@@ -122,18 +123,23 @@ void HX8367_SetDataOnPins(uint8_t data)
 	else HX8367_D7_RESET;
 }
 
-uint8_t HX8367_ReadDataFromPins()
+__STATIC_INLINE void HX8367_SetModePins(uint32_t modeMask)
+{
+	MODIFY_REG(HX8367_D0_PORT->MODER, (0x3 << HX8367_D0_PIN * 2U), (modeMask << HX8367_D0_PIN * 2U));
+	MODIFY_REG(HX8367_D1_PORT->MODER, (0x3 << HX8367_D1_PIN * 2U), (modeMask << HX8367_D1_PIN * 2U));
+	MODIFY_REG(HX8367_D2_PORT->MODER, (0x3 << HX8367_D2_PIN * 2U), (modeMask << HX8367_D2_PIN * 2U));
+	MODIFY_REG(HX8367_D3_PORT->MODER, (0x3 << HX8367_D3_PIN * 2U), (modeMask << HX8367_D3_PIN * 2U));
+	MODIFY_REG(HX8367_D4_PORT->MODER, (0x3 << HX8367_D4_PIN * 2U), (modeMask << HX8367_D4_PIN * 2U));
+	MODIFY_REG(HX8367_D5_PORT->MODER, (0x3 << HX8367_D5_PIN * 2U), (modeMask << HX8367_D5_PIN * 2U));
+	MODIFY_REG(HX8367_D6_PORT->MODER, (0x3 << HX8367_D6_PIN * 2U), (modeMask << HX8367_D6_PIN * 2U));
+	MODIFY_REG(HX8367_D7_PORT->MODER, (0x3 << HX8367_D7_PIN * 2U), (modeMask << HX8367_D7_PIN * 2U));
+}
+
+__STATIC_INLINE uint8_t HX8367_ReadDataFromPins()
 {
 	uint8_t res = 0;
 
-	LL_GPIO_SetPinMode(HX8367_D0_PORT, (1<<HX8367_D0_PIN), LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinMode(HX8367_D1_PORT, (1<<HX8367_D1_PIN), LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinMode(HX8367_D2_PORT, (1<<HX8367_D2_PIN), LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinMode(HX8367_D3_PORT, (1<<HX8367_D3_PIN), LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinMode(HX8367_D4_PORT, (1<<HX8367_D4_PIN), LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinMode(HX8367_D5_PORT, (1<<HX8367_D5_PIN), LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinMode(HX8367_D6_PORT, (1<<HX8367_D6_PIN), LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinMode(HX8367_D7_PORT, (1<<HX8367_D7_PIN), LL_GPIO_MODE_INPUT);
+	HX8367_SetModePins(0x00);
 
 	if(HX8367_D0_PORT->IDR & (1<<HX8367_D0_PIN)) res |= (1<<0);
 	if(HX8367_D1_PORT->IDR & (1<<HX8367_D1_PIN)) res |= (1<<1);
@@ -144,14 +150,7 @@ uint8_t HX8367_ReadDataFromPins()
 	if(HX8367_D6_PORT->IDR & (1<<HX8367_D6_PIN)) res |= (1<<6);
 	if(HX8367_D7_PORT->IDR & (1<<HX8367_D7_PIN)) res |= (1<<7);
 
-	LL_GPIO_SetPinMode(HX8367_D0_PORT, (1<<HX8367_D0_PIN), LL_GPIO_MODE_OUTPUT);
-	LL_GPIO_SetPinMode(HX8367_D1_PORT, (1<<HX8367_D1_PIN), LL_GPIO_MODE_OUTPUT);
-	LL_GPIO_SetPinMode(HX8367_D2_PORT, (1<<HX8367_D2_PIN), LL_GPIO_MODE_OUTPUT);
-	LL_GPIO_SetPinMode(HX8367_D3_PORT, (1<<HX8367_D3_PIN), LL_GPIO_MODE_OUTPUT);
-	LL_GPIO_SetPinMode(HX8367_D4_PORT, (1<<HX8367_D4_PIN), LL_GPIO_MODE_OUTPUT);
-	LL_GPIO_SetPinMode(HX8367_D5_PORT, (1<<HX8367_D5_PIN), LL_GPIO_MODE_OUTPUT);
-	LL_GPIO_SetPinMode(HX8367_D6_PORT, (1<<HX8367_D6_PIN), LL_GPIO_MODE_OUTPUT);
-	LL_GPIO_SetPinMode(HX8367_D7_PORT, (1<<HX8367_D7_PIN), LL_GPIO_MODE_OUTPUT);
+	HX8367_SetModePins(0x01);
 
 	return res;
 }
@@ -357,6 +356,13 @@ HX8367_Stat HX8367_SetWindow(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 	return HX8367_statOK;
 }
 
+__STATIC_INLINE uint8_t HX8367_NormalizeColor(uint8_t in, uint8_t normValue)
+{
+	// (0...255) to (0...normValue)
+	uint8_t out;
+	return out = (uint8_t)((double)in * (double)normValue / 255.0);
+}
+
 HX8367_Stat HX8367_SetColor(uint8_t R, uint8_t G, uint8_t B)	// TODO Переделать для разных схем (5-6-5 и 6-6-6)
 {
 	_HX8367_color.R = R;
@@ -508,7 +514,7 @@ HX8367_Stat HX8367_DrawCircle(uint16_t x0, uint16_t y0, uint16_t R, int thicknes
 			delta += 2 * (++x - --y);
 		}
 
-		R--;
+		(R != 0) ? R-- : R;
 	}
 
 	return HX8367_statOK;
@@ -521,10 +527,7 @@ void HX8367_test()
 
 	HX8367_SetColor(0, 0, 0);
 	HX8367_DrawRectangle(10,30,100,100,4);
-
-
-	HX8367_DrawCircle(30,150,50,2);
-
+	HX8367_DrawCircle(30,150,3,10);
 }
 
 

@@ -1,4 +1,3 @@
-
 #include "LCD1602A.h"
 
 void LCD1602_PinSetByte(uint8_t Byte);								//Set pin according 'Byte'

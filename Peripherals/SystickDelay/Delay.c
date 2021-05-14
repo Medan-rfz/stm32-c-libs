@@ -1,5 +1,5 @@
-#include "delay.h"
-#include "main.h"
+#include "Delay.h"
+#include "stm32f4xx.h"	// Connect lib for your stm
 
 static __IO uint32_t usTicks;
 

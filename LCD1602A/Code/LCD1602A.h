@@ -1,9 +1,8 @@
-
 #ifndef __LCD1602A_H
 #define __LCD1602A_H
 
-#include "main.h"
-#include "stdint.h"
+#include <stdint.h>
+#include "stm32f4xx.h"	// Connect lib for your stm
 
 //=====Function=====
 //-----Users-----
