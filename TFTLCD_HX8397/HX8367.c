@@ -3,7 +3,7 @@
 #include "stm32f4xx.h"		// Connect lib for your stm
 
 /////////////////////////////////////////////////////////
-/////				Settings block					/////
+/////				Settings block
 /////////////////////////////////////////////////////////
 
 //#define FULL_MANUAL_PINS
@@ -61,7 +61,7 @@
 #endif
 
 /////////////////////////////////////////////////////////
-/////			  End settings block				/////
+/////			  End settings block
 /////////////////////////////////////////////////////////
 
 #define HX8367_D0_SET HX8367_D0_PORT->BSRR = (1<<HX8367_D0_PIN)
@@ -92,17 +92,10 @@
 #define HX8367_RD_SET HX8367_RD_PORT->BSRR = (1<<HX8367_RD_PIN)
 #define HX8367_RD_RESET HX8367_RD_PORT->BSRR = (1<<(HX8367_RD_PIN + 16))
 
-typedef struct
-{
-	uint8_t R;
-	uint8_t G;
-	uint8_t B;
-	uint8_t byte0;
-	uint8_t byte1;
-} HX8367_Color;
-
+extern const uint8_t fontArial_11x16[];
 static HX8367_Color _HX8367_color;
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 __STATIC_INLINE void HX8367_SetDataOnPins(uint8_t data)
 {
 	if((uint8_t)0x01U & data) HX8367_D0_SET;
@@ -123,6 +116,7 @@ __STATIC_INLINE void HX8367_SetDataOnPins(uint8_t data)
 	else HX8367_D7_RESET;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 __STATIC_INLINE void HX8367_SetModePins(uint32_t modeMask)
 {
 	MODIFY_REG(HX8367_D0_PORT->MODER, (0x3 << HX8367_D0_PIN * 2U), (modeMask << HX8367_D0_PIN * 2U));
@@ -135,6 +129,7 @@ __STATIC_INLINE void HX8367_SetModePins(uint32_t modeMask)
 	MODIFY_REG(HX8367_D7_PORT->MODER, (0x3 << HX8367_D7_PIN * 2U), (modeMask << HX8367_D7_PIN * 2U));
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 __STATIC_INLINE uint8_t HX8367_ReadDataFromPins()
 {
 	uint8_t res = 0;
@@ -155,6 +150,7 @@ __STATIC_INLINE uint8_t HX8367_ReadDataFromPins()
 	return res;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 void HX8367_WriteReg(uint8_t data)
 {
 	HX8367_RS_RESET;
@@ -166,6 +162,7 @@ void HX8367_WriteReg(uint8_t data)
 	HX8367_CS_SET;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 void HX8367_WriteData8(uint8_t data)
 {
 	HX8367_RS_SET;
@@ -177,6 +174,7 @@ void HX8367_WriteData8(uint8_t data)
 	HX8367_CS_SET;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 void HX8367_WriteData16(uint8_t data0, uint8_t data1)
 {
 	HX8367_RS_SET;
@@ -191,6 +189,7 @@ void HX8367_WriteData16(uint8_t data0, uint8_t data1)
 	HX8367_CS_SET;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 uint8_t HX8367_ReadData()
 {
 	uint8_t res = 0;
@@ -206,6 +205,7 @@ uint8_t HX8367_ReadData()
 	return res;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 void HX8367_Reset()
 {
 	HX8367_RST_SET;
@@ -220,6 +220,7 @@ void HX8367_Reset()
 	DelayMs(120);
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 inline void HX8367_Init()
 {
 	HX8367_Reset();			// Hardware reset
@@ -320,6 +321,7 @@ inline void HX8367_Init()
 	DelayMs(1);
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 HX8367_Stat HX8367_SetWindow(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	if((x1 > x2) || (y1 > y2))
@@ -356,6 +358,7 @@ HX8367_Stat HX8367_SetWindow(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 	return HX8367_statOK;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 __STATIC_INLINE uint8_t HX8367_NormalizeColor(uint8_t in, uint8_t normValue)
 {
 	// (0...255) to (0...normValue)
@@ -363,7 +366,8 @@ __STATIC_INLINE uint8_t HX8367_NormalizeColor(uint8_t in, uint8_t normValue)
 	return out = (uint8_t)((double)in * (double)normValue / 255.0);
 }
 
-HX8367_Stat HX8367_SetColor(uint8_t R, uint8_t G, uint8_t B)	// TODO Переделать для разных схем (5-6-5 и 6-6-6)
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
+HX8367_Stat HX8367_SetColor(uint8_t R, uint8_t G, uint8_t B)
 {
 	_HX8367_color.R = R;
 	_HX8367_color.G = G;
@@ -379,13 +383,15 @@ HX8367_Stat HX8367_SetColor(uint8_t R, uint8_t G, uint8_t B)	// TODO Перед�
 	return HX8367_statOK;
 }
 
-void HX8367_SendColorPixel()		// TODO Переделать для разных схем (5-6-5 и 6-6-6)
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
+void HX8367_SendColorPixel()
 {
 	HX8367_WriteData8(_HX8367_color.byte0);
 	HX8367_WriteData8(_HX8367_color.byte1);
 }
 
-HX8367_Stat HX8367_DrawPoint(uint16_t x, uint16_t y)
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
+HX8367_Stat HX8367_DrawPixel(uint16_t x, uint16_t y)
 {
 	if((x > 239) || (y > 319))
 		return HX8367_statErr;
@@ -395,6 +401,7 @@ HX8367_Stat HX8367_DrawPoint(uint16_t x, uint16_t y)
 	return HX8367_statOK;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 HX8367_Stat HX8367_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	int xerr=0, yerr=0, dx, dy, distance;
@@ -426,7 +433,7 @@ HX8367_Stat HX8367_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 
 	for(uint16_t t = 0; t <= distance+1; t++)
 	{
-		HX8367_DrawPoint(uRow,uCol);
+		HX8367_DrawPixel(uRow,uCol);
 		xerr += dx;
 		yerr += dy;
 		if(xerr > distance)
@@ -444,6 +451,7 @@ HX8367_Stat HX8367_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 	return HX8367_statOK;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 HX8367_Stat HX8367_DrawFillRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 {
 	__IO uint32_t pixelsNumber;
@@ -461,6 +469,7 @@ HX8367_Stat HX8367_DrawFillRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint
 	return HX8367_statOK;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 HX8367_Stat HX8367_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, int thickness)
 {
 	while(thickness--)
@@ -475,6 +484,7 @@ HX8367_Stat HX8367_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t
 	return HX8367_statOK;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 HX8367_Stat HX8367_DrawCircle(uint16_t x0, uint16_t y0, uint16_t R, int thickness)
 {
 	int x, y ,delta, error;
@@ -488,14 +498,14 @@ HX8367_Stat HX8367_DrawCircle(uint16_t x0, uint16_t y0, uint16_t R, int thicknes
 
 		while (y >= x)
 		{
-			HX8367_DrawPoint(x0 + x, y0 + y);
-			HX8367_DrawPoint(x0 + x, y0 - y);
-			HX8367_DrawPoint(x0 - x, y0 + y);
-			HX8367_DrawPoint(x0 - x, y0 - y);
-			HX8367_DrawPoint(x0 + y, y0 + x);
-			HX8367_DrawPoint(x0 + y, y0 - x);
-			HX8367_DrawPoint(x0 - y, y0 + x);
-			HX8367_DrawPoint(x0 - y, y0 - x);
+			HX8367_DrawPixel(x0 + x, y0 + y);
+			HX8367_DrawPixel(x0 + x, y0 - y);
+			HX8367_DrawPixel(x0 - x, y0 + y);
+			HX8367_DrawPixel(x0 - x, y0 - y);
+			HX8367_DrawPixel(x0 + y, y0 + x);
+			HX8367_DrawPixel(x0 + y, y0 - x);
+			HX8367_DrawPixel(x0 - y, y0 + x);
+			HX8367_DrawPixel(x0 - y, y0 - x);
 
 			error = 2 * (delta + y) - 1;
 
@@ -520,14 +530,64 @@ HX8367_Stat HX8367_DrawCircle(uint16_t x0, uint16_t y0, uint16_t R, int thicknes
 	return HX8367_statOK;
 }
 
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
+void HX8367_DrawChar_11x16(uint16_t *x, uint16_t *y, HX8367_Color *colorChar, HX8367_Color *colorBackground, char c)
+{
+	uint8_t buf[32];
+	uint16_t rowMask = 0;
+
+	for(int i = 0; i<32; i++)
+		buf[i] = fontArial_11x16[((uint8_t)c - 32) * 32 + i];
+
+	HX8367_SetWindow(*x, *y, *x+10, *y+15);
+
+	for(uint8_t row = 0; row < 16; row++)
+	{
+		rowMask = ((uint16_t)buf[row*2] << 8) | (uint16_t)buf[(row*2)+1];
+
+		for(uint8_t column = 0; column < 11; column++)
+		{
+			if((rowMask>>(15-column)) & 0x1)
+			{
+				HX8367_SetColor(colorChar->R, colorChar->G, colorChar->B);
+				HX8367_DrawPixel(*x+column, *y+row);
+			}
+			else
+			{
+				HX8367_SetColor(colorBackground->R, colorBackground->G, colorBackground->B);
+				HX8367_DrawPixel(*x+column, *y+row);
+			}
+		}
+	}
+
+	*x += 11;
+}
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
+void HX8367_DrawString(uint16_t x, uint16_t y, HX8367_Color *colorChar, HX8367_Color *colorBackground,
+						void (*func)(uint16_t*, uint16_t*, HX8367_Color*, HX8367_Color*, char), char *str)
+{
+	for(int i = 0; str[i] !='\0'; i++)
+		func(&x, &y, colorChar, colorBackground, str[i]);
+}
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 void HX8367_test()
 {
-	HX8367_SetColor(255, 255, 255);
+	HX8367_SetColor(0, 255, 0);
 	HX8367_DrawFillRectangle(0, 0, 239, 319);
 
-	HX8367_SetColor(0, 0, 0);
-	HX8367_DrawRectangle(10,30,100,100,4);
-	HX8367_DrawCircle(30,150,3,10);
+	HX8367_Color CharColor, BgColor;
+
+	CharColor.R = 0;
+	CharColor.G = 0;
+	CharColor.B = 0;
+
+	BgColor.R = 255;
+	BgColor.G = 255;
+	BgColor.B = 255;
+
+	HX8367_DrawString(10, 10, &CharColor, &BgColor, HX8367_DrawChar_11x16, "Hello world!");
 }
 
 
