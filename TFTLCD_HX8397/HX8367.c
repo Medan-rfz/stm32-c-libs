@@ -92,7 +92,8 @@
 #define HX8367_RD_SET HX8367_RD_PORT->BSRR = (1<<HX8367_RD_PIN)
 #define HX8367_RD_RESET HX8367_RD_PORT->BSRR = (1<<(HX8367_RD_PIN + 16))
 
-extern const uint8_t fontArial_11x16[];
+extern const uint8_t fontArial_11x14[];
+extern const uint8_t fontArial_16x20[];
 static HX8367_Color _HX8367_color;
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
@@ -531,17 +532,17 @@ HX8367_Stat HX8367_DrawCircle(uint16_t x0, uint16_t y0, uint16_t R, int thicknes
 }
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
-void HX8367_DrawChar_11x16(uint16_t *x, uint16_t *y, HX8367_Color *colorChar, HX8367_Color *colorBackground, char c)
+void HX8367_DrawChar_11x14(uint16_t *x, uint16_t *y, HX8367_Color *colorChar, HX8367_Color *colorBackground, uint8_t c)
 {
-	uint8_t buf[32];
+	uint8_t buf[28];
 	uint16_t rowMask = 0;
 
-	for(int i = 0; i<32; i++)
-		buf[i] = fontArial_11x16[((uint8_t)c - 32) * 32 + i];
+	for(int i = 0; i<28; i++)
+		buf[i] = fontArial_11x14[(c - 32) * 28 + i];
 
-	HX8367_SetWindow(*x, *y, *x+10, *y+15);
+	HX8367_SetWindow(*x, *y, *x+10, *y+13);
 
-	for(uint8_t row = 0; row < 16; row++)
+	for(uint8_t row = 0; row < 14; row++)
 	{
 		rowMask = ((uint16_t)buf[row*2] << 8) | (uint16_t)buf[(row*2)+1];
 
@@ -564,8 +565,41 @@ void HX8367_DrawChar_11x16(uint16_t *x, uint16_t *y, HX8367_Color *colorChar, HX
 }
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
+void HX8367_DrawChar_16x20(uint16_t *x, uint16_t *y, HX8367_Color *colorChar, HX8367_Color *colorBackground, uint8_t c)
+{
+	uint8_t buf[40];
+	uint16_t rowMask = 0;
+
+	for(int i = 0; i<40; i++)
+		buf[i] = fontArial_16x20[(c - 32) * 40 + i];
+
+	HX8367_SetWindow(*x, *y, *x+15, *y+19);
+
+	for(uint8_t row = 0; row < 20; row++)
+	{
+		rowMask = ((uint16_t)buf[row*2] << 8) | (uint16_t)buf[(row*2)+1];
+
+		for(uint8_t column = 0; column < 16; column++)
+		{
+			if((rowMask>>(15-column)) & 0x1)
+			{
+				HX8367_SetColor(colorChar->R, colorChar->G, colorChar->B);
+				HX8367_DrawPixel(*x+column, *y+row);
+			}
+			else
+			{
+				HX8367_SetColor(colorBackground->R, colorBackground->G, colorBackground->B);
+				HX8367_DrawPixel(*x+column, *y+row);
+			}
+		}
+	}
+
+	*x += 16;
+}
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 void HX8367_DrawString(uint16_t x, uint16_t y, HX8367_Color *colorChar, HX8367_Color *colorBackground,
-						void (*func)(uint16_t*, uint16_t*, HX8367_Color*, HX8367_Color*, char), char *str)
+						void (*func)(uint16_t*, uint16_t*, HX8367_Color*, HX8367_Color*, uint8_t), char *str)
 {
 	for(int i = 0; str[i] !='\0'; i++)
 		func(&x, &y, colorChar, colorBackground, str[i]);
@@ -574,20 +608,22 @@ void HX8367_DrawString(uint16_t x, uint16_t y, HX8367_Color *colorChar, HX8367_C
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 void HX8367_test()
 {
-	HX8367_SetColor(0, 255, 0);
+	HX8367_SetColor(0, 0, 0);
 	HX8367_DrawFillRectangle(0, 0, 239, 319);
 
 	HX8367_Color CharColor, BgColor;
 
-	CharColor.R = 0;
-	CharColor.G = 0;
-	CharColor.B = 0;
+	CharColor.R = 255;
+	CharColor.G = 255;
+	CharColor.B = 255;
 
-	BgColor.R = 255;
-	BgColor.G = 255;
-	BgColor.B = 255;
+	BgColor.R = 0;
+	BgColor.G = 0;
+	BgColor.B = 0;
 
-	HX8367_DrawString(10, 10, &CharColor, &BgColor, HX8367_DrawChar_11x16, "Hello world!");
+	HX8367_DrawString(10, 10, &CharColor, &BgColor, HX8367_DrawChar_11x14, "Hello world!");
+	HX8367_DrawString(10, 24, &CharColor, &BgColor, HX8367_DrawChar_11x14, "Привет мир!");
+	HX8367_DrawString(10, 38, &CharColor, &BgColor, HX8367_DrawChar_16x20, "Hello world!");
 }
 
 

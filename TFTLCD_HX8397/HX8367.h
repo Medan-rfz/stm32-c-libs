@@ -26,9 +26,9 @@ HX8367_Stat HX8367_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 HX8367_Stat HX8367_DrawFillRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 HX8367_Stat HX8367_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, int thickness);
 HX8367_Stat HX8367_DrawCircle(uint16_t x0, uint16_t y0, uint16_t R, int thickness);
-void HX8367_DrawChar_11x16(uint16_t *x, uint16_t *y, HX8367_Color *colorChar, HX8367_Color *colorBackground, char c);
+void HX8367_DrawChar_11x14(uint16_t *x, uint16_t *y, HX8367_Color *colorChar, HX8367_Color *colorBackground, uint8_t c);
 void HX8367_DrawString(uint16_t x, uint16_t y, HX8367_Color *colorChar, HX8367_Color *colorBackground,
-						void (*func)(uint16_t*, uint16_t*, HX8367_Color*, HX8367_Color*, char), char *str);
+						void (*func)(uint16_t*, uint16_t*, HX8367_Color*, HX8367_Color*, uint8_t), char *str);
 void HX8367_test();
 
 #endif
