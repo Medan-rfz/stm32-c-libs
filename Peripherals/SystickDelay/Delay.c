@@ -9,22 +9,32 @@ void SysTick_Handler()
     if (usTicks != 0)
         usTicks--;
     else
+    {
     	SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+    	usTicks = 0;
     	//SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk;
+    }
 }
 
 void DelayInit()
 {
     SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / 1000000); // 1 us
+    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+    SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
 }
 
 void DelayUs(uint32_t us)
 {
 	//SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
-	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+	while(!(SysTick->CTRL & SysTick_CTRL_ENABLE_Msk))
+		SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
 	usTicks = us;
-	while (usTicks);
+	while (usTicks)
+	{
+		if(!(SysTick->CTRL & SysTick_CTRL_ENABLE_Msk))
+			SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+	}
 }
 
 void DelayMs(uint32_t ms)
