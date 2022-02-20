@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "spi.h": "c",
+        "delay.h": "c",
+        "i2c.h": "c",
+        "mfrc522.h": "c",
+        "mpu9250.h": "c",
+        "hx8367.h": "c"
+    }
+}

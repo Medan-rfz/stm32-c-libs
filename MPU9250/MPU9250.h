@@ -1,17 +1,6 @@
 #ifndef __MPU9250_H
 #define __MPU9250_H
 
-#define MPU9250_USING_I2C
-
-#ifdef MPU9250_USING_I2C
-#include "../Peripherals/STM32F4_I2C/I2C.h"
-#endif
-
-/* Не реализовано
-#ifdef MPU9250_USING_SPI
-#include "../Peripherals/STM32F4_SPI/SPI.h"
-#endif*/
-
 typedef enum
 {
 	MPU9250_Ok,
@@ -162,8 +151,8 @@ typedef struct
 MPU9250_Status MPU9250_Init(MPU9250_StructBehavior *bstruct, I2C_TypeDef *i2c);
 
 uint8_t MPU9250_ReadOnceReg(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr);
-void MPU9250_ReadReg(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr, uint8_t *outBuf, short int count);
-void MPU9250_WriteReg(MPU9250_StructBehavior *bstruct, uint8_t WriteAddr, uint8_t data);
+MPU9250_Status MPU9250_ReadReg(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr, uint8_t *outBuf, short int count);
+MPU9250_Status MPU9250_WriteReg(MPU9250_StructBehavior *bstruct, uint8_t WriteAddr, uint8_t data);
 uint8_t MPU9250_ReadOnceRegAK893(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr);
 void MPU9250_ReadRegAK893(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr, uint8_t *outBuf, short int count);
 void MPU9250_WriteRegAK893(MPU9250_StructBehavior *bstruct, uint8_t WriteAddr, uint8_t data);

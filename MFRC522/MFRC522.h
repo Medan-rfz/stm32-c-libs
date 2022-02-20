@@ -2,7 +2,6 @@
 #define __MFRC522_H
 
 #include <stdint.h>
-#include "SPI.h"
 
 typedef enum
 {

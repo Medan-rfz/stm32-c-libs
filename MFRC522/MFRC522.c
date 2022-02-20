@@ -1,6 +1,7 @@
+#include "stm_pch.h"	// User precompile file in project folder with header on used stm32
+#include "SPI.h"
 #include "MFRC522.h"
 #include "Delay.h"
-#include "stm32f4xx.h"		// Connect lib for your stm
 
 /////////////////////////////////////////////////////////
 /////		Settings block

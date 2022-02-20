@@ -1,5 +1,6 @@
+#include "stm_pch.h"	// User precompile file in project folder with header on used stm32
 #include "SPI.h"
-#include "../SystickDelay/Delay.h"
+#include "Delay.h"
 	
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
 inline uint8_t SPI_TransferByte(SPI_TypeDef *spi, uint8_t byte, int timeout)

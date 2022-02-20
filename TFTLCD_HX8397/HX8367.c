@@ -1,6 +1,6 @@
+#include <Peripherals/STM32F4_I2C/I2C.h>
 #include "HX8367.h"
 #include "Delay.h"
-#include "stm32f4xx.h"		// Connect lib for your stm
 
 /////////////////////////////////////////////////////////
 /////				Settings block
@@ -622,7 +622,7 @@ void HX8367_test()
 	BgColor.B = 0;
 
 	HX8367_DrawString(10, 10, &CharColor, &BgColor, HX8367_DrawChar_11x14, "Hello world!");
-	HX8367_DrawString(10, 24, &CharColor, &BgColor, HX8367_DrawChar_11x14, "Привет мир!");
+	HX8367_DrawString(10, 24, &CharColor, &BgColor, HX8367_DrawChar_11x14, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ!");
 	HX8367_DrawString(10, 38, &CharColor, &BgColor, HX8367_DrawChar_16x20, "Hello world!");
 }
 

@@ -2,7 +2,6 @@
 #define __I2C_H
 
 #include <stdint.h>
-#include "stm32f4xx.h" // Connect lib for your stm
 
 typedef enum
 {

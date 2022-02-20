@@ -1,5 +1,5 @@
+#include "stm_pch.h"	// User precompile file in project folder with header on used stm32
 #include "Delay.h"
-#include "stm32f4xx.h"	// Connect lib for your stm
 
 
 static __IO uint32_t usTicks;

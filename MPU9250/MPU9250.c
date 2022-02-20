@@ -1,3 +1,5 @@
+#include "stm_pch.h"	// User precompile file in project folder with header on used stm32
+#include "I2C.h"
 #include "MPU9250.h"
 
 MPU9250_Status MPU9250_WaitEndTransfer(MPU9250_StructBehavior *bstruct, uint32_t timeout);
@@ -39,21 +41,27 @@ uint8_t MPU9250_ReadOnceReg(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr)
 }
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
-void MPU9250_ReadReg(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr, uint8_t *outBuf, short int count)
+MPU9250_Status MPU9250_ReadReg(MPU9250_StructBehavior *bstruct, uint8_t ReadAddr, uint8_t *outBuf, short int count)
 {
+	MPU9250_Status stat = 0;
+
 	I2C_SetParam(&bstruct->i2c, I2C_READ, bstruct->Addr, ReadAddr, outBuf, 0, count);
 	I2C_Start(&bstruct->i2c);
 
-	MPU9250_WaitEndTransfer(bstruct, 100000);
+	stat = MPU9250_WaitEndTransfer(bstruct, 100000);
+	return stat;
 }
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
-void MPU9250_WriteReg(MPU9250_StructBehavior *bstruct, uint8_t WriteAddr, uint8_t data)
+MPU9250_Status MPU9250_WriteReg(MPU9250_StructBehavior *bstruct, uint8_t WriteAddr, uint8_t data)
 {
+	MPU9250_Status stat = 0;
+
 	I2C_SetParam(&bstruct->i2c, I2C_WRITE, bstruct->Addr, WriteAddr, 0, data, 1);
 	I2C_Start(&bstruct->i2c);
 
-	MPU9250_WaitEndTransfer(bstruct, 100000);
+	stat = MPU9250_WaitEndTransfer(bstruct, 100000);
+	return stat;
 }
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
@@ -92,7 +100,7 @@ void MPU9250_ReadAllMeasurements(MPU9250_StructBehavior *bstruct, uint16_t *acce
 	uint8_t MPU9250_data[14] = { 0 };
 	uint8_t AK893_data[6] = { 0 };
 
-	MPU9250_ReadReg(bstruct, MPU9250_ACCEL_XOUT_H, MPU9250_data, 14);
+	MPU9250_Status stat = MPU9250_ReadReg(bstruct, MPU9250_ACCEL_XOUT_H, MPU9250_data, 14);
 	MPU9250_ReadRegAK893(bstruct, AK8963_XOUT_L, AK893_data, 6);
 
 	if(accel != 0)

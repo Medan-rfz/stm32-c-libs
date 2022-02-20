@@ -1,3 +1,4 @@
+#include "stm_pch.h"	// User precompile file in project folder with header on used stm32
 #include "I2C.h"
 
 #define I2C_DEBUG
@@ -267,6 +268,7 @@ void I2C_ParamReset(I2C_StructBehavior *bstruct)
 I2C_Status I2C_Start(I2C_StructBehavior *bstruct)
 {
 	bstruct->i2c->CR1 |= I2C_CR1_START;
+	return I2C_Ok;
 }
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*//
@@ -274,13 +276,13 @@ uint8_t I2C_FindAllDevices(I2C_StructBehavior *bstruct, uint8_t *buf, int timeou
 {
 	uint8_t addr = 1;
 	uint8_t count = 0;
-	int _timeout;
+	//int _timeout;
 
 	uint8_t data;
 
 	for(;addr <= 127; addr++)
 	{
-		_timeout = timeout;
+		//_timeout = timeout;
 		I2C_SetParam(bstruct, I2C_READ, addr, 0x00, &data, 0, 1);
 		I2C1->CR1 |= I2C_CR1_START;
 
